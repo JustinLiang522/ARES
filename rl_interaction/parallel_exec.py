@@ -30,6 +30,7 @@ def main():
     parser.add_argument('--appium_ports', help='delimited list input', type=str, required=True)
     parser.add_argument('--android_ports', help='android ports e.g. 5554 5556 ...', type=str, required=True)
     parser.add_argument('--udids', type=str, required=False)
+    parser.add_argument('--hosts', type=str, required=False)
     # the folders to pick apks from
     parser.add_argument('--path', help='folder of apps', type=str, required=True)
     # set a timer for testing
@@ -87,9 +88,11 @@ def main():
     iterations = args.iterations
     assert len(device_names) == len(appium_ports) == len(android_ports)
     udids = []
+    hosts = []
     # Setting emulator names
     if real_device:
         udids = [str(u) for u in args.udids.split(" ")]
+        hosts = [str(u) for u in args.hosts.split(" ")]
     else:
         for port in android_ports:
             udids.append(f'emulator-{port}')
@@ -103,7 +106,7 @@ def main():
         script = os.path.abspath(os.path.join(__file__, os.pardir, 'test_application.py'))
         cmd = [py, script, '--algo', algo, '--appium_port',
                str(appium_ports[i]), '--timesteps', str(timesteps), '--iterations', str(iterations),
-               '--udid', str(udids[i]), '--android_port', str(android_ports[i]), '--device_name', device_names[i],
+               '--udid', str(udids[i]), '--host', str(hosts[i]), '--android_port', str(android_ports[i]), '--device_name', device_names[i],
                '--apps', f'{app_lists[i]}', '--max_timesteps', str(max_timesteps), '--pool_strings', pool_strings,
                '--timer', str(timer), '--platform_version', android_v, '--trials_per_app', str(trials_per_app),
                '--menu']

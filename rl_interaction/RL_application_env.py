@@ -12,6 +12,7 @@ from selenium.common.exceptions import InvalidElementStateException, WebDriverEx
     StaleElementReferenceException, InvalidSessionIdException, NoSuchElementException, ElementNotVisibleException
 from appium.webdriver.common.touch_action import TouchAction
 from rl_interaction.utils.utils import Utils
+from rl_interaction.utils.MonkeyRealtimeManager import MonkeyRealtimeManager
 from multiprocessing import Process, Queue
 from appium import webdriver
 from collections import deque
@@ -66,11 +67,13 @@ class RLApplicationEnv(Env):
 
     def __init__(self, coverage_dict, app_path, list_activities,
                  widget_list, bug_set, coverage_dir, log_dir, rotation, internet, merdoso_button_menu, platform_name,
-                 platform_version, udid, instr_emma, instr_jacoco,
+                 platform_version, udid, host, instr_emma, instr_jacoco,
                  device_name, exported_activities, services, receivers,
                  is_headless, appium, emulator, package, pool_strings, visited_activities: list, clicked_buttons: list,
                  number_bugs: list, appium_port, max_episode_len=250, string_activities='',
                  instr=False, OBSERVATION_SPACE=2000, ACTION_SPACE=30):
+
+        self.coverage = MonkeyRealtimeManager.getInstance(host=host)
 
         self.OBSERVATION_SPACE = OBSERVATION_SPACE
         self.ACTION_SPACE = ACTION_SPACE
@@ -120,7 +123,7 @@ class RLApplicationEnv(Env):
         self.widget_list = widget_list
         self.views = {}
 
-        self.logger_id = logger.add(os.path.join(self.log_dir, 'action_logger.log'), format="{time} {level} {message}",
+        self.logger_id = logger.add(os.path.join(self.log_dir, 'action_logger.log'), mode='w', format="{time} {level} {message}",
                                     level='DEBUG')
 
         self.bug_logger_id = logger.add(os.path.join(self.log_dir, 'bug_logger.log'), format="{time} {level} {message}",
@@ -237,6 +240,10 @@ class RLApplicationEnv(Env):
                 # Do Action
                 self.action(current_view, action_number)
                 time.sleep(0.2)
+
+        # Get Covered Methods
+        logger.debug(f'entries: {self.coverage.getMethodEntries()}')
+
         self.bug, self.outside = self.check_activity()
         if self.outside:
             self.outside = False

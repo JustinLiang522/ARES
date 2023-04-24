@@ -57,6 +57,7 @@ def main():
     parser.add_argument('--platform_name', choices=['Android', 'iOS'], type=str, default='Android')
     parser.add_argument('--platform_version', type=str, default='9.0')
     parser.add_argument('--udid', type=str, default='emulator-5554')
+    parser.add_argument('--host', type=str, default='127.0.0.1')
     parser.add_argument('--device_name', type=str, default='test0')
     parser.add_argument('--android_port', type=str, default='5554')
     parser.add_argument('--apps', type=str, required=True)
@@ -86,6 +87,7 @@ def main():
     platform_name = args.platform_name
     platform_version = args.platform_version
     udid = args.udid
+    host = args.host
     # Check this in case of name error
     device_name = args.device_name.replace('_', ' ')
     rotation = args.rotation
@@ -182,6 +184,7 @@ def main():
                                            platform_name=platform_name,
                                            platform_version=platform_version,
                                            udid=udid,
+                                           host=host,
                                            pool_strings=pool_strings,
                                            device_name=device_name,
                                            max_episode_len=max_timesteps,
